@@ -1,5 +1,6 @@
 from django.contrib import admin
-from .models import Category, Customer, Product, Order
+from .models import Category, Customer, Product, Order, User
+from django.contrib.auth.admin import UserAdmin
 
 
 # Register your models here.
@@ -35,3 +36,24 @@ class OrderAdmin(admin.ModelAdmin):
     search_fields = ('customer__first_name', 'customer__last_name', 'product__name', 'phone')
     list_filter = ('status', 'date_ordered')
     ordering = ('date_ordered', 'status')
+
+
+@admin.register(User)
+class CustomUserAdmin(UserAdmin):
+    model = User
+    list_display = ('username', 'email', 'phone', 'is_staff', 'is_active')
+    list_filter = ('is_staff', 'is_active')
+    fieldsets = (
+        (None, {'fields': ('username', 'password')}),
+        ('Personal info', {'fields': ('first_name', 'last_name', 'email', 'phone')}),
+        ('Permissions', {'fields': ('is_staff', 'is_active', 'is_superuser', 'groups', 'user_permissions')}),
+        ('Important dates', {'fields': ('last_login', 'date_joined')}),
+    )
+    add_fieldsets = (
+        (None, {
+            'classes': ('wide',),
+            'fields': ('username', 'email', 'phone', 'password1', 'password2', 'is_staff', 'is_active'),
+        }),
+    )
+    search_fields = ('email', 'username', 'phone')
+    ordering = ('username',)
