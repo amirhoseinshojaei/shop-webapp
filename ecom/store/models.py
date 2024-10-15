@@ -3,6 +3,7 @@ import datetime
 from phonenumber_field.modelfields import PhoneNumberField
 from django.contrib.auth.hashers import make_password
 from django.contrib.auth.models import AbstractUser
+from django.utils.text import slugify
 
 
 # Create your models here.
@@ -19,12 +20,18 @@ class User(AbstractUser):
 
 class Category(models.Model):
     name = models.CharField(max_length=100)
+    slug = models.SlugField(blank=True, null=True,unique=True)
 
     class Meta:
         verbose_name_plural = 'Categories'
 
     def __str__(self):
         return self.name
+
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.name)
+        super(Category, self).save(*args, **kwargs)
 
 
 class Customer(models.Model):

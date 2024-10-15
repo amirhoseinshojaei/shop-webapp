@@ -1,0 +1,52 @@
+
+{% load static %}
+
+
+{% block content %}
+
+
+    <!-- store/product_details.html -->
+
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>{{ product.name }} - Product Details</title>
+        <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- اگر استایل دارید -->
+    </head>
+    <body>
+        <div class="container">
+            <h1>{{ product.name }}</h1>
+
+            <!-- اگر محصول تصویر دارد -->
+            {% if product.image %}
+                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 300px; height: auto;">
+            {% endif %}
+
+            {% if product.is_sale %}
+                <!-- Product price-->
+                <strike>
+                    $ {{product.price}}
+                </strike>
+                &nbsp;${{product.sale_price}}
+                <p><strong>Description:</strong> {{ product.description }}</p>
+
+
+
+            {% else %}
+                <p><strong>Price:</strong> ${{ product.price }}</p>
+                <p><strong>Description:</strong> {{ product.description }}</p>
+            {% endif %}
+            <!-- افزودن دکمه خرید یا گزینه‌های بیشتر -->
+
+
+            <a href="{% url 'index' %}">Back to Products</a> <!-- لینک برگشت به لیست محصولات -->
+        </div>
+</html>
+
+
+
+
+
+
+{% endblock %}

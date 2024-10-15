@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect
-from .models import Product, User
+from .models import Product, User, Category
 from django.contrib.auth import login, authenticate, logout
 from django.contrib import messages
 from django.contrib.auth.hashers import make_password
@@ -10,6 +10,28 @@ from django.contrib.auth.hashers import make_password
 def index(request):
     products = Product.objects.all()
     return render(request, 'store/index.html', context={'products': products})
+
+
+def product_details(request, pk):
+    product = Product.objects.get(id=pk)
+    return render(request, 'store/product_details.html', context={'product': product})
+
+
+def category_details(request, slug):
+    # Replace Hyphens with spaces
+    # foo = foo.replace('-', ' ')
+    # Grab the Category from url
+    try:
+        # Look Up the Category
+        category = Category.objects.get(slug=slug)
+        products = Product.objects.filter(category=category)
+
+        # Fetch all categories for the navbar
+        categories = Category.objects.all()
+        return render(request, 'store/category_details.html', context={'categories': categories, 'category': category, 'products': products})
+    except category.DoesNotExist:
+        messages.error(request, 'Category does not exist')
+        return redirect('index')
 
 
 def about(request):
@@ -59,12 +81,13 @@ def register(request):
         user = User.objects.create(
             username=username,
             email=email,
-            phone_number=phone,
+            phone=phone,
             password=make_password(password)  # Password should be hashed
         )
         user.save()
 
-        messages.success(request, 'User created successfully! Please log in.')
-        return redirect('login')
+        messages.success(request, 'User created successfully!')
+        login(request, user)
+        return redirect('index')
     else:
         return render(request, 'store/register.html')
