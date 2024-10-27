@@ -1,75 +1,91 @@
+{% extends 'base.html' %} 
 
-{% load static %}
+{% load static %} 
 
+{% block title %}| {{ product.name }}{% endblock title %} 
 
 {% block content %}
 
-
-    <!-- store/product_details.html -->
-
-<html lang="en">
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{% block title %}{{product.name}}{% endblock %}</title>
-        <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- اگر استایل دارید -->
-    </head>
-    <body>
-        <div class="container">
-            <h1>{{ product.name }}</h1>
-
-            <!-- اگر محصول تصویر دارد -->
-            {% if product.image %}
-                <img src="{{ product.image.url }}" alt="{{ product.name }}" style="width: 300px; height: auto;">
-            {% endif %}
-
-            {% if product.is_sale %}
-                <!-- Product price-->
-                <strike>
-                    $ {{product.price}}
-                </strike>
-                &nbsp;${{product.sale_price}}
-                <p><strong>Description:</strong> {{ product.description }}</p>
-
-
-
-            {% else %}
-                <p><strong>Price:</strong> ${{ product.price }}</p>
-                <p><strong>Description:</strong> {{ product.description }}</p>
-            {% endif %}
-            <!-- افزودن دکمه خرید یا گزینه‌های بیشتر -->
-
-            <button type="submit" class="btn btn-secondary" value="{{product.id}}" id="add-cart">Add to Cart</button>
-
-
-            <a href="{% url 'index' %}">Back to Products</a> <!-- لینک برگشت به لیست محصولات -->
+<div class="container mt-5">
+  <div class="card mb-3 shadow p-4">
+    <div class="row g-0">
+      <div class="col-md-4">
+        <img
+          src="{{ product.image.url }}"
+          class="img-fluid"
+          alt="{{ product.name }}"
+        />
+      </div>
+      <div class="col-md-8">
+        <div class="card-body">
+          <h5 class="card-title">{{ product.name }}</h5>
+          <p class="card-text">{{ product.description }}</p>
+          {% if product.is_sale %}
+          <div class="d-flex small text-warning mb-2">
+            <div class="bi-star-fill"></div>
+            &nbsp;&nbsp;Sale!&nbsp;&nbsp;
+            <div class="bi-star-fill"></div>
+          </div>
+          <strike style="color: red">${{ product.price }}</strike>&nbsp;&nbsp;
+          <b>${{ product.sale_price }}</b>
+          <p class="card-text">Category: {{ product.category }}</p>
+          {% else %}
+          <p class="card-text">Category: {{ product.category }}</p>
+          <p class="card-text">
+            <small class="text-body-secondary"
+              >Price: ${{ product.price }}</small
+            >
+          </p>
+          {% endif %}
         </div>
-</html>
-
-
+        <div class="mb-3 px-3">
+          <div class="col-md-2">Quantity: </div>
+            <div class="col-md-2">
+              <select class="form-select" id="qty-cart" style="max-width: 12rem;">
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+              </select>
+            </div>
+        </div>
+        <div class="ms-3 mb-3">
+          <button
+            type="button"
+            class="btn btn-secondary"
+            value="{{ product.id }}"
+            id="add-cart"
+          >
+            Add to Cart
+          </button>
+          <!-- <a href="#" class="btn btn-outline-secondary">Add to watch list</a> -->
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
 <script>
-    // Check if add-cart button pressed
-    $(document).on("click", "#add-cart", function(e){
-      e.preventDefault();
-      $.ajax({
-        type: "POST",
-        url: "{% url 'cart-add' %}",
-        data: {
-          product_id: $("#add-cart").val(),
-          product_qty: $('#qty-cart option:selected').text(),
-          csrfmiddlewaretoken: "{{ csrf_token }}",
-          action: "post",
-        },
-        success: function(json){
-           // console.log(json);
-           document.getElementById('cart_quantity').textContent = json.qty
-           location.reload()
-        },
-        error: function (xhr, errmsg, err) {},
-      });
+  // Check if add-cart button pressed
+  $(document).on("click", "#add-cart", function(e){
+    e.preventDefault();
+    $.ajax({
+      type: "POST",
+      url: "{% url 'cart-add' %}",
+      data: {
+        product_id: $("#add-cart").val(),
+        product_qty: $('#qty-cart option:selected').text(),
+        csrfmiddlewaretoken: "{{ csrf_token }}",
+        action: "post",
+      },
+      success: function(json){
+         // console.log(json);
+         document.getElementById('cart_quantity').textContent = json.qty
+         location.reload()
+      },
+      error: function (xhr, errmsg, err) {},
     });
-  </script>
+  });
+</script>
 
-
-
-{% endblock %}
+{% endblock content %}
