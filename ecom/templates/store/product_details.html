@@ -11,7 +11,7 @@
     <head>
         <meta charset="UTF-8">
         <meta name="viewport" content="width=device-width, initial-scale=1.0">
-        <title>{{ product.name }} - Product Details</title>
+        <title>{% block title %}{{product.name}}{% endblock %}</title>
         <link rel="stylesheet" href="{% static 'css/styles.css' %}"> <!-- اگر استایل دارید -->
     </head>
     <body>
@@ -39,13 +39,36 @@
             {% endif %}
             <!-- افزودن دکمه خرید یا گزینه‌های بیشتر -->
 
+            <button type="submit" class="btn btn-secondary" value="{{product.id}}" id="add-cart">Add to Cart</button>
+
 
             <a href="{% url 'index' %}">Back to Products</a> <!-- لینک برگشت به لیست محصولات -->
         </div>
 </html>
 
 
-
+<script>
+    // Check if add-cart button pressed
+    $(document).on("click", "#add-cart", function(e){
+      e.preventDefault();
+      $.ajax({
+        type: "POST",
+        url: "{% url 'cart-add' %}",
+        data: {
+          product_id: $("#add-cart").val(),
+          product_qty: $('#qty-cart option:selected').text(),
+          csrfmiddlewaretoken: "{{ csrf_token }}",
+          action: "post",
+        },
+        success: function(json){
+           // console.log(json);
+           document.getElementById('cart_quantity').textContent = json.qty
+           location.reload()
+        },
+        error: function (xhr, errmsg, err) {},
+      });
+    });
+  </script>
 
 
 
